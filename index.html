@@ -1,0 +1,1269 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Customer Voice Command Center - Revlytics</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #050814;
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.05) 0px, transparent 50%),
+                radial-gradient(at 50% 0%, rgba(168, 85, 247, 0.03) 0px, transparent 50%),
+                radial-gradient(at 100% 0%, rgba(239, 68, 68, 0.03) 0px, transparent 50%);
+            background-attachment: fixed;
+        }
+
+        h1, h2, h3, .font-display {
+            font-family: 'Outfit', sans-serif;
+        }
+
+        .card {
+            background: rgba(17, 24, 39, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(31, 41, 55, 0.8);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.4);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .card:hover {
+            border-color: rgba(99, 102, 241, 0.3);
+            box-shadow: 0 10px 30px -10px rgba(99, 102, 241, 0.15);
+        }
+
+        .glow-indigo {
+            box-shadow: 0 0 20px rgba(99, 102, 241, 0.1);
+        }
+
+        .glow-red {
+            box-shadow: 0 0 20px rgba(239, 68, 68, 0.1);
+        }
+
+        /* SPA Panel transitions */
+        .panel {
+            display: none;
+            opacity: 0;
+            transform: translateY(12px);
+            transition: opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1), transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .panel.active {
+            display: block;
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Nav states */
+        .nav-btn.active {
+            background: linear-gradient(135deg, #4f46e5 0%, #3b82f6 100%);
+            color: #ffffff;
+            box-shadow: 0 4px 15px rgba(79, 70, 229, 0.4);
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #090d1a;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #1e293b;
+            border-radius: 9999px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #334155;
+        }
+
+        /* Typing cursor micro-animation */
+        .typing-dot {
+            animation: bounce 1.4s infinite ease-in-out both;
+        }
+        .typing-dot:nth-child(1) { animation-delay: -0.32s; }
+        .typing-dot:nth-child(2) { animation-delay: -0.16s; }
+
+        @keyframes bounce {
+            0%, 80%, 100% { transform: scale(0); }
+            40% { transform: scale(1.0); }
+        }
+    </style>
+</head>
+
+<body class="text-slate-100 min-h-screen flex flex-col">
+
+    <div class="flex flex-1">
+
+        <!-- SIDEBAR -->
+        <aside class="w-72 border-r border-slate-800/80 bg-[#070b19] p-6 hidden lg:flex flex-col justify-between sticky top-0 h-screen select-none">
+            <div>
+                <!-- LOGO / BRANDING -->
+                <div class="mb-10 flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 to-blue-500 flex items-center justify-center font-bold text-white shadow-lg shadow-indigo-500/30 text-lg">
+                        R
+                    </div>
+                    <div>
+                        <h1 class="text-lg font-bold tracking-tight text-white leading-none">
+                            Revlytics
+                        </h1>
+                        <p class="text-xs text-indigo-400 font-semibold mt-1 tracking-wider uppercase">
+                            Command Center
+                        </p>
+                    </div>
+                </div>
+
+                <!-- NAVIGATION -->
+                <nav class="space-y-1" id="sidebar-nav">
+                    <button data-target="overview" class="nav-btn active w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition text-left text-slate-400 hover:text-white hover:bg-slate-800/50">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2H6a2 2 0 01-2-2v-4zM14 16a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2h-2a2 2 0 01-2-2v-4z"></path></svg>
+                        Overview
+                    </button>
+
+                    <button data-target="products" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition text-left text-slate-400 hover:text-white hover:bg-slate-800/50">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>
+                        Products
+                    </button>
+
+                    <button data-target="issues" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition text-left text-slate-400 hover:text-white hover:bg-slate-800/50">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                        Issues
+                        <span class="ml-auto w-2 h-2 rounded-full bg-red-500 animate-pulse"></span>
+                    </button>
+
+                    <button data-target="customer-voice" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition text-left text-slate-400 hover:text-white hover:bg-slate-800/50">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path></svg>
+                        Customer Voice
+                    </button>
+
+                    <button data-target="opportunities" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition text-left text-slate-400 hover:text-white hover:bg-slate-800/50">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path></svg>
+                        Opportunities
+                    </button>
+
+                    <button data-target="ai-analyst" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition text-left text-slate-400 hover:text-white hover:bg-slate-800/50">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                        AI Analyst
+                    </button>
+                </nav>
+            </div>
+
+            <!-- FOOTER INFO -->
+            <div class="border-t border-slate-800/60 pt-6">
+                <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center font-bold text-slate-300">
+                        SS
+                    </div>
+                    <div>
+                        <p class="text-sm font-semibold text-white">Suraj S.</p>
+                        <p class="text-xs text-slate-500">Premium Account</p>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- MAIN LAYOUT -->
+        <main class="flex-1 p-6 lg:p-10 max-w-7xl mx-auto w-full overflow-x-hidden flex flex-col justify-between">
+
+            <!-- MOBILE NAV BAR -->
+            <header class="lg:hidden flex justify-between items-center mb-8 border-b border-slate-800 pb-4">
+                <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center font-bold text-white text-sm">
+                        R
+                    </div>
+                    <span class="font-bold text-lg">Revlytics</span>
+                </div>
+                <div class="flex gap-1" id="mobile-nav-buttons">
+                    <button data-target="overview" class="mobile-nav-btn p-2 text-indigo-400 font-semibold text-xs border border-indigo-500/20 rounded bg-indigo-500/10">Overview</button>
+                    <button data-target="products" class="mobile-nav-btn p-2 text-slate-400 text-xs hover:text-white">Products</button>
+                    <button data-target="issues" class="mobile-nav-btn p-2 text-slate-400 text-xs hover:text-white">Issues</button>
+                    <button data-target="customer-voice" class="mobile-nav-btn p-2 text-slate-400 text-xs hover:text-white">Voice</button>
+                    <button data-target="opportunities" class="mobile-nav-btn p-2 text-slate-400 text-xs hover:text-white">Ideas</button>
+                    <button data-target="ai-analyst" class="mobile-nav-btn p-2 text-slate-400 text-xs hover:text-white">AI</button>
+                </div>
+            </header>
+
+            <!-- SUB-PAGES -->
+            <div id="dashboard-panels" class="flex-1 w-full">
+
+                <!-- 1. OVERVIEW PANEL -->
+                <section id="panel-overview" class="panel active">
+                    <div class="mb-10">
+                        <p class="text-slate-400 text-sm font-semibold tracking-wider uppercase mb-1">
+                            Tuesday, 16 June
+                        </p>
+                        <h2 class="text-4xl font-extrabold tracking-tight text-white mb-2">
+                            Good Morning 👋
+                        </h2>
+                        <p class="text-lg text-slate-300">
+                            Your brand is experiencing positive reviews and improved sentiment this week.
+                        </p>
+                    </div>
+
+                    <!-- HERO METRICS -->
+                    <div class="grid md:grid-cols-3 gap-6 mb-8">
+                        <div class="card rounded-3xl p-6 glow-indigo relative overflow-hidden flex flex-col justify-between">
+                            <div class="absolute -right-4 -bottom-4 w-24 h-24 bg-indigo-500/5 rounded-full blur-xl"></div>
+                            <div>
+                                <p class="text-xs font-bold uppercase tracking-wider text-slate-400">
+                                    Brand Health Score
+                                </p>
+                                <div class="flex items-baseline gap-3 mt-4">
+                                    <h3 class="text-6xl font-black text-white">87</h3>
+                                    <span class="text-sm font-bold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full flex items-center gap-0.5">
+                                        ↑ 4 pts
+                                    </span>
+                                </div>
+                            </div>
+                            <p class="text-xs text-slate-500 mt-6 border-t border-slate-800/80 pt-3">
+                                Weighted average sentiment score this week.
+                            </p>
+                        </div>
+
+                        <div class="card rounded-3xl p-6 relative overflow-hidden flex flex-col justify-between">
+                            <div>
+                                <p class="text-xs font-bold uppercase tracking-wider text-slate-400">
+                                    Total Analyzed Reviews
+                                </p>
+                                <div class="flex items-baseline gap-3 mt-4">
+                                    <h3 class="text-5xl font-black text-white">12,548</h3>
+                                </div>
+                            </div>
+                            <p class="text-xs text-slate-500 mt-6 border-t border-slate-800/80 pt-3 flex gap-2">
+                                <span class="px-1.5 py-0.5 bg-slate-800 rounded">Amazon</span>
+                                <span class="px-1.5 py-0.5 bg-slate-800 rounded">Flipkart</span>
+                                <span class="px-1.5 py-0.5 bg-slate-800 rounded">Shopify</span>
+                                <span class="px-1.5 py-0.5 bg-slate-800 rounded">Google</span>
+                            </p>
+                        </div>
+
+                        <div class="card rounded-3xl p-6 relative overflow-hidden flex flex-col justify-between border-red-500/20 hover:border-red-500/40">
+                            <div>
+                                <div class="flex justify-between items-center">
+                                    <p class="text-xs font-bold uppercase tracking-wider text-slate-400">
+                                        Critical Alerts
+                                    </p>
+                                    <span class="w-2.5 h-2.5 rounded-full bg-red-500 animate-ping"></span>
+                                </div>
+                                <h3 class="text-2xl font-bold text-red-400 mt-4 leading-tight">
+                                    Delivery delays up 22%
+                                </h3>
+                                <p class="text-sm text-slate-300 mt-1">
+                                    Affecting Vitamin C Serum orders
+                                </p>
+                            </div>
+                            <button onclick="switchTab('issues')" class="mt-4 text-xs font-bold text-red-400 flex items-center gap-1 hover:underline text-left">
+                                View issue report →
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- ACTION REQUIRED BANNER -->
+                    <section class="card rounded-3xl p-8 mb-8 border-l-4 border-red-500 bg-red-950/10 glow-red">
+                        <div class="flex items-center gap-3 mb-4">
+                            <div class="w-2.5 h-2.5 rounded-full bg-red-500"></div>
+                            <h3 class="text-lg font-bold text-red-400">Action Required</h3>
+                        </div>
+                        <h4 class="text-2xl font-bold mb-3 text-white">
+                            Delivery complaints increased by 22% on Amazon
+                        </h4>
+                        <p class="text-slate-300 text-base mb-6 max-w-3xl">
+                            Customers are reporting longer checkout-to-delivery windows, putting product review scores at immediate risk.
+                        </p>
+                        <div class="grid grid-cols-2 sm:grid-cols-3 gap-6 max-w-2xl text-sm mb-6">
+                            <div>
+                                <p class="text-slate-500">Affected SKU</p>
+                                <p class="font-bold text-slate-200 mt-1">Vitamin C Serum</p>
+                            </div>
+                            <div>
+                                <p class="text-slate-500">Predicted Score Impact</p>
+                                <p class="font-bold text-red-400 mt-1">-0.3 Rating Drop</p>
+                            </div>
+                            <div>
+                                <p class="text-slate-500">Recommended Next Step</p>
+                                <p class="font-bold text-indigo-300 mt-1">Review third-party courier SLAs</p>
+                            </div>
+                        </div>
+                        <button onclick="switchTab('issues')" class="bg-red-600 hover:bg-red-700 text-white px-5 py-2.5 rounded-xl font-bold transition text-sm">
+                            Investigate Issue Details
+                        </button>
+                    </section>
+
+                    <!-- BRIEF & FEEDBACK GRID -->
+                    <div class="grid lg:grid-cols-3 gap-8">
+                        <!-- AI WEEKLY BRIEF -->
+                        <div class="card rounded-3xl p-6 lg:col-span-2">
+                            <div class="flex items-center gap-3 mb-6">
+                                <div class="w-9 h-9 rounded-xl bg-indigo-600/20 text-indigo-400 flex items-center justify-center font-bold text-lg">
+                                    🤖
+                                </div>
+                                <h3 class="text-xl font-bold text-white">AI Weekly Brief</h3>
+                            </div>
+                            <div class="space-y-4 text-slate-300 leading-relaxed text-sm">
+                                <p>
+                                    Customers continue praising <span class="text-white font-semibold">product quality</span> and the <span class="text-white font-semibold">premium packaging design</span> across most SKUs.
+                                </p>
+                                <p>
+                                    However, the dominant negative driver this week is <span class="text-red-400 font-semibold">delivery delays</span>, accounting for 35% of all 1-to-3 star reviews.
+                                </p>
+                                <p>
+                                    If delivery performance improves and courier bottlenecks on Amazon are resolved, the AI forecasts the brand rating to recover from <span class="text-green-400 font-semibold">4.3 → 4.6 stars</span>.
+                                </p>
+                            </div>
+                            <div class="mt-6 pt-5 border-t border-slate-800/80 flex items-center justify-between text-xs text-slate-500">
+                                <span>Updated hourly</span>
+                                <button onclick="switchTab('ai-analyst')" class="text-indigo-400 hover:underline font-semibold">
+                                    Ask Analyst to drill down →
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- LOVE / HATE HIGHLIGHTS -->
+                        <div class="card rounded-3xl p-6 flex flex-col justify-between">
+                            <div>
+                                <h3 class="text-lg font-bold mb-4 text-white">Sentiment Drivers</h3>
+                                <div class="space-y-4">
+                                    <div>
+                                        <div class="flex justify-between text-xs mb-1">
+                                            <span class="text-emerald-400 font-medium">Product Quality</span>
+                                            <span class="text-slate-400">92%</span>
+                                        </div>
+                                        <div class="h-1.5 bg-slate-800 rounded-full overflow-hidden">
+                                            <div class="h-full bg-emerald-500 rounded-full" style="width: 92%"></div>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <div class="flex justify-between text-xs mb-1">
+                                            <span class="text-emerald-400 font-medium">Packaging Design</span>
+                                            <span class="text-slate-400">84%</span>
+                                        </div>
+                                        <div class="h-1.5 bg-slate-800 rounded-full overflow-hidden">
+                                            <div class="h-full bg-emerald-500 rounded-full" style="width: 84%"></div>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <div class="flex justify-between text-xs mb-1">
+                                            <span class="text-red-400 font-medium">Delivery Delays</span>
+                                            <span class="text-slate-400">35%</span>
+                                        </div>
+                                        <div class="h-1.5 bg-slate-800 rounded-full overflow-hidden">
+                                            <div class="h-full bg-red-500 rounded-full" style="width: 35%"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <button onclick="switchTab('customer-voice')" class="mt-6 w-full text-center text-xs bg-slate-800/80 hover:bg-slate-800 text-slate-300 py-2 rounded-xl transition border border-slate-700/60 font-semibold">
+                                View Reviews Voice
+                            </button>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 2. PRODUCTS PANEL -->
+                <section id="panel-products" class="panel">
+                    <div class="mb-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                        <div>
+                            <h2 class="text-3xl font-extrabold tracking-tight text-white mb-2">Product Health Center</h2>
+                            <p class="text-slate-400">Monitor customer sentiment scores and trends across your catalog.</p>
+                        </div>
+                        <div class="flex items-center gap-2 bg-slate-900 border border-slate-800 p-1 rounded-xl">
+                            <button onclick="filterProducts('all')" id="prod-filter-all" class="prod-filter-btn px-4 py-1.5 rounded-lg text-xs font-semibold bg-indigo-600 text-white">All</button>
+                            <button onclick="filterProducts('healthy')" id="prod-filter-healthy" class="prod-filter-btn px-4 py-1.5 rounded-lg text-xs font-semibold text-slate-400 hover:text-white">Healthy</button>
+                            <button onclick="filterProducts('stable')" id="prod-filter-stable" class="prod-filter-btn px-4 py-1.5 rounded-lg text-xs font-semibold text-slate-400 hover:text-white">Stable</button>
+                            <button onclick="filterProducts('at-risk')" id="prod-filter-at-risk" class="prod-filter-btn px-4 py-1.5 rounded-lg text-xs font-semibold text-slate-400 hover:text-white">At Risk</button>
+                        </div>
+                    </div>
+
+                    <!-- PRODUCTS LISTING -->
+                    <div class="grid lg:grid-cols-3 gap-6 mb-8" id="product-grid-container">
+                        <!-- Vitamin C Serum -->
+                        <div class="product-card card rounded-3xl p-6 flex flex-col justify-between" data-status="healthy">
+                            <div>
+                                <div class="flex justify-between items-start mb-4">
+                                    <div>
+                                        <p class="text-xs text-slate-500 uppercase tracking-wider">Skincare</p>
+                                        <h3 class="text-xl font-bold mt-1 text-white">Vitamin C Serum</h3>
+                                    </div>
+                                    <span class="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-3 py-1 rounded-full text-xs font-semibold">
+                                        Healthy
+                                    </span>
+                                </div>
+                                <div class="my-6 flex items-baseline gap-2">
+                                    <h4 class="text-5xl font-black text-emerald-400">92</h4>
+                                    <span class="text-xs text-slate-500">Health Score</span>
+                                </div>
+                                <div class="space-y-2.5 text-sm pt-4 border-t border-slate-800/80">
+                                    <div class="flex justify-between">
+                                        <span class="text-slate-500">Reviews</span>
+                                        <span class="font-medium text-slate-300">4,312</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span class="text-slate-500">Avg Rating</span>
+                                        <span class="font-medium text-slate-300">⭐ 4.8</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span class="text-slate-500">Trend</span>
+                                        <span class="font-bold text-emerald-400">↗ Growing</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <button onclick="drillDownProduct('Vitamin C Serum')" class="mt-6 w-full text-center text-xs bg-indigo-500/10 hover:bg-indigo-500/20 border border-indigo-500/20 py-2.5 rounded-xl font-semibold text-indigo-300 transition">
+                                Drill Down Sentiment
+                            </button>
+                        </div>
+
+                        <!-- Face Wash -->
+                        <div class="product-card card rounded-3xl p-6 flex flex-col justify-between" data-status="stable">
+                            <div>
+                                <div class="flex justify-between items-start mb-4">
+                                    <div>
+                                        <p class="text-xs text-slate-500 uppercase tracking-wider">Skincare</p>
+                                        <h3 class="text-xl font-bold mt-1 text-white">Face Wash</h3>
+                                    </div>
+                                    <span class="bg-amber-500/10 text-amber-400 border border-amber-500/20 px-3 py-1 rounded-full text-xs font-semibold">
+                                        Stable
+                                    </span>
+                                </div>
+                                <div class="my-6 flex items-baseline gap-2">
+                                    <h4 class="text-5xl font-black text-amber-400">84</h4>
+                                    <span class="text-xs text-slate-500">Health Score</span>
+                                </div>
+                                <div class="space-y-2.5 text-sm pt-4 border-t border-slate-800/80">
+                                    <div class="flex justify-between">
+                                        <span class="text-slate-500">Reviews</span>
+                                        <span class="font-medium text-slate-300">2,871</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span class="text-slate-500">Avg Rating</span>
+                                        <span class="font-medium text-slate-300">⭐ 4.2</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span class="text-slate-500">Trend</span>
+                                        <span class="font-medium text-amber-400">→ Stable</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <button onclick="drillDownProduct('Face Wash')" class="mt-6 w-full text-center text-xs bg-indigo-500/10 hover:bg-indigo-500/20 border border-indigo-500/20 py-2.5 rounded-xl font-semibold text-indigo-300 transition">
+                                Drill Down Sentiment
+                            </button>
+                        </div>
+
+                        <!-- Sunscreen -->
+                        <div class="product-card card rounded-3xl p-6 flex flex-col justify-between border-red-500/30 hover:border-red-500" data-status="at-risk">
+                            <div>
+                                <div class="flex justify-between items-start mb-4">
+                                    <div>
+                                        <p class="text-xs text-slate-500 uppercase tracking-wider">Sun Care</p>
+                                        <h3 class="text-xl font-bold mt-1 text-white">Sunscreen SPF 50</h3>
+                                    </div>
+                                    <span class="bg-red-500/10 text-red-400 border border-red-500/20 px-3 py-1 rounded-full text-xs font-semibold">
+                                        At Risk
+                                    </span>
+                                </div>
+                                <div class="my-6 flex items-baseline gap-2">
+                                    <h4 class="text-5xl font-black text-red-400">71</h4>
+                                    <span class="text-xs text-slate-500">Health Score</span>
+                                </div>
+                                <div class="space-y-2.5 text-sm pt-4 border-t border-slate-800/80">
+                                    <div class="flex justify-between">
+                                        <span class="text-slate-500">Reviews</span>
+                                        <span class="font-medium text-slate-300">1,203</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span class="text-slate-500">Avg Rating</span>
+                                        <span class="font-medium text-slate-300">⭐ 3.7</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span class="text-slate-500">Trend</span>
+                                        <span class="font-bold text-red-400">↘ Declining</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mt-4 bg-red-500/5 border border-red-500/15 rounded-xl p-3 text-xs text-red-300">
+                                AI alert: Leak complaints on cap seal.
+                            </div>
+                            <button onclick="drillDownProduct('Sunscreen SPF 50')" class="mt-4 w-full text-center text-xs bg-indigo-500/10 hover:bg-indigo-500/20 border border-indigo-500/20 py-2.5 rounded-xl font-semibold text-indigo-300 transition">
+                                Drill Down Sentiment
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- DETAILED LIST AND SUBVIEW DRAWER -->
+                    <div id="product-drilldown-section" class="card rounded-3xl p-6 hidden">
+                        <div class="flex justify-between items-center mb-6">
+                            <h3 class="text-xl font-bold" id="drilldown-title">Vitamin C Serum Feedback Breakdown</h3>
+                            <button onclick="closeProductDrilldown()" class="text-xs font-bold text-indigo-400 hover:underline">
+                                Close Breakdown
+                            </button>
+                        </div>
+                        <div class="grid md:grid-cols-2 gap-6">
+                            <div class="bg-[#0b1020]/80 p-5 rounded-2xl border border-slate-800">
+                                <h4 class="text-sm font-semibold text-emerald-400 mb-3">Key Sentiment Drivers (Positive)</h4>
+                                <ul class="space-y-2.5 text-sm text-slate-300">
+                                    <li class="flex items-start gap-2">
+                                        <span class="text-emerald-400">✓</span>
+                                        "Skin radiance improvement noticed in 4 days"
+                                    </li>
+                                    <li class="flex items-start gap-2">
+                                        <span class="text-emerald-400">✓</span>
+                                        "Lightweight texture, absorbed immediately"
+                                    </li>
+                                    <li class="flex items-start gap-2">
+                                        <span class="text-emerald-400">✓</span>
+                                        "Glass dropper bottles feel highly premium"
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="bg-[#0b1020]/80 p-5 rounded-2xl border border-slate-800">
+                                <h4 class="text-sm font-semibold text-red-400 mb-3">Key Friction Points (Negative)</h4>
+                                <ul class="space-y-2.5 text-sm text-slate-300">
+                                    <li class="flex items-start gap-2">
+                                        <span class="text-red-400">✗</span>
+                                        "Amazon orders taking up to 7 days to arrive"
+                                    </li>
+                                    <li class="flex items-start gap-2">
+                                        <span class="text-red-400">✗</span>
+                                        "Occasionally sold out on official Shopify site"
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 3. ISSUES PANEL -->
+                <section id="panel-issues" class="panel">
+                    <div class="mb-8">
+                        <h2 class="text-3xl font-extrabold tracking-tight text-white mb-2">Issue Triage Desk</h2>
+                        <p class="text-slate-400">Investigate and take immediate action on AI-flagged customer service risks.</p>
+                    </div>
+
+                    <div class="grid lg:grid-cols-3 gap-8 mb-8">
+                        <!-- ACTIVE ISSUE WORKSPACE -->
+                        <div class="card rounded-3xl p-6 lg:col-span-2 border-red-500/30">
+                            <div class="flex justify-between items-start mb-6">
+                                <div class="flex items-center gap-3">
+                                    <span class="w-3 h-3 rounded-full bg-red-500 animate-ping"></span>
+                                    <h3 class="text-xl font-bold text-white">Delivery delay complaints increased by 22%</h3>
+                                </div>
+                                <span class="bg-red-500/10 text-red-400 border border-red-500/20 px-3 py-0.5 rounded text-xs font-bold uppercase">
+                                    Critical
+                                </span>
+                            </div>
+
+                            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 p-4 bg-slate-900/50 rounded-2xl border border-slate-800 mb-6 text-xs">
+                                <div>
+                                    <p class="text-slate-500 font-medium">Unique Mentions</p>
+                                    <p class="text-lg font-bold text-white mt-1">1,284 reviews</p>
+                                </div>
+                                <div>
+                                    <p class="text-slate-500 font-medium">Timeline</p>
+                                    <p class="text-lg font-bold text-white mt-1">Last 10 days</p>
+                                </div>
+                                <div>
+                                    <p class="text-slate-500 font-medium">Target SKU</p>
+                                    <p class="text-lg font-bold text-indigo-400 mt-1">Vitamin C Serum</p>
+                                </div>
+                                <div>
+                                    <p class="text-slate-500 font-medium">Primary Source</p>
+                                    <p class="text-lg font-bold text-amber-500 mt-1">Amazon IN</p>
+                                </div>
+                            </div>
+
+                            <h4 class="font-semibold text-sm mb-3 text-slate-300">Customer Evidence Snippets</h4>
+                            <div class="space-y-3 mb-6">
+                                <div class="bg-slate-950/40 p-4 rounded-xl border border-slate-800 text-xs italic text-slate-300 leading-relaxed">
+                                    "The serum formulation is perfect, but shipping took almost a week. Please address this courier speed."
+                                </div>
+                                <div class="bg-slate-950/40 p-4 rounded-xl border border-slate-800 text-xs italic text-slate-300 leading-relaxed">
+                                    "Delivery notifications were broken. It arrived late on Amazon, without any tracking updates."
+                                </div>
+                            </div>
+
+                            <!-- RECOMMENDED ACTION CHECKLIST -->
+                            <div class="bg-indigo-500/5 border border-indigo-500/20 rounded-2xl p-5">
+                                <div class="flex justify-between items-center mb-4">
+                                    <h4 class="font-bold text-indigo-300 text-sm">Action Checklist</h4>
+                                    <span id="checklist-progress" class="text-xs text-indigo-400 font-bold">0% Completed</span>
+                                </div>
+                                <div class="space-y-3" id="issue-checklist">
+                                    <label class="flex items-center gap-3 cursor-pointer text-slate-300 hover:text-white text-xs select-none">
+                                        <input type="checkbox" onclick="updateChecklistProgress()" class="issue-checkbox rounded border-slate-700 bg-slate-900 text-indigo-600 focus:ring-indigo-500/50 w-4.5 h-4.5">
+                                        <span>Audit carrier partner performance metrics & compare SLAs</span>
+                                    </label>
+                                    <label class="flex items-center gap-3 cursor-pointer text-slate-300 hover:text-white text-xs select-none">
+                                        <input type="checkbox" onclick="updateChecklistProgress()" class="issue-checkbox rounded border-slate-700 bg-slate-900 text-indigo-600 focus:ring-indigo-500/50 w-4.5 h-4.5">
+                                        <span>Establish real-time webhook for shipping status notifications</span>
+                                    </label>
+                                    <label class="flex items-center gap-3 cursor-pointer text-slate-300 hover:text-white text-xs select-none">
+                                        <input type="checkbox" onclick="updateChecklistProgress()" class="issue-checkbox rounded border-slate-700 bg-slate-900 text-indigo-600 focus:ring-indigo-500/50 w-4.5 h-4.5">
+                                        <span>Send automated $5 coupons to customers impacted by delays > 4 days</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- OTHER REPORTED RISKS -->
+                        <div class="space-y-6">
+                            <div class="card rounded-3xl p-6">
+                                <h3 class="text-lg font-bold text-white mb-4">Other Open Alerts</h3>
+                                <div class="space-y-4">
+                                    <div class="p-3 bg-amber-500/5 border border-amber-500/20 rounded-xl">
+                                        <div class="flex justify-between mb-1">
+                                            <span class="text-xs font-bold text-amber-400">Packaging Leaks</span>
+                                            <span class="text-slate-500 text-[10px]">Medium Priority</span>
+                                        </div>
+                                        <p class="text-xs text-slate-300">Complaints about Sunscreen cap seal leak increased 8% on Flipkart.</p>
+                                    </div>
+                                    <div class="p-3 bg-slate-800/40 border border-slate-800 rounded-xl">
+                                        <div class="flex justify-between mb-1">
+                                            <span class="text-xs font-bold text-slate-400">Support delays</span>
+                                            <span class="text-slate-500 text-[10px]">Low Priority</span>
+                                        </div>
+                                        <p class="text-xs text-slate-300">Average support ticket response time went up 1.5h during weekend.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 4. CUSTOMER VOICE PANEL -->
+                <section id="panel-customer-voice" class="panel">
+                    <div class="mb-8">
+                        <h2 class="text-3xl font-extrabold tracking-tight text-white mb-2">Voice of Customer</h2>
+                        <p class="text-slate-400">Search and filter real reviews from Google, Amazon, Shopify, and Flipkart.</p>
+                    </div>
+
+                    <!-- SEARCH & FILTER TOOLBAR -->
+                    <div class="card rounded-3xl p-6 mb-8">
+                        <div class="grid md:grid-cols-4 gap-4">
+                            <!-- SEARCH FIELD -->
+                            <div class="md:col-span-2 relative">
+                                <input type="text" id="review-search" oninput="filterReviews()" placeholder="Search review content (e.g. shipping, radiance, quality)..." class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-2.5 text-slate-200 text-sm focus:outline-none focus:border-indigo-500">
+                            </div>
+                            <!-- PLATFORM FILTER -->
+                            <div>
+                                <select id="review-platform" onchange="filterReviews()" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-2.5 text-slate-300 text-sm focus:outline-none focus:border-indigo-500">
+                                    <option value="all">All Platforms</option>
+                                    <option value="Amazon">Amazon</option>
+                                    <option value="Shopify">Shopify</option>
+                                    <option value="Flipkart">Flipkart</option>
+                                    <option value="Google">Google Reviews</option>
+                                </select>
+                            </div>
+                            <!-- RATING FILTER -->
+                            <div>
+                                <select id="review-rating" onchange="filterReviews()" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-2.5 text-slate-300 text-sm focus:outline-none focus:border-indigo-500">
+                                    <option value="all">All Star Ratings</option>
+                                    <option value="5">⭐⭐⭐⭐⭐ (5 Stars)</option>
+                                    <option value="4">⭐⭐⭐⭐ (4 Stars)</option>
+                                    <option value="3">⭐⭐⭐ (3 Stars)</option>
+                                    <option value="2">⭐⭐ (2 Stars)</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- THEME CHIPS -->
+                        <div class="mt-4 pt-4 border-t border-slate-800/80 flex flex-wrap items-center gap-2">
+                            <span class="text-xs text-slate-500 uppercase tracking-wider mr-2">Quick Theme Filters:</span>
+                            <button onclick="toggleThemeFilter('Product Quality')" class="theme-chip px-3 py-1 bg-slate-800 text-slate-300 text-xs rounded-full hover:bg-slate-700 transition">Product Quality</button>
+                            <button onclick="toggleThemeFilter('Premium Packaging')" class="theme-chip px-3 py-1 bg-slate-800 text-slate-300 text-xs rounded-full hover:bg-slate-700 transition">Premium Packaging</button>
+                            <button onclick="toggleThemeFilter('Delivery Delays')" class="theme-chip px-3 py-1 bg-slate-800 text-slate-300 text-xs rounded-full hover:bg-slate-700 transition">Delivery Delays</button>
+                            <button onclick="toggleThemeFilter('Tracking Issues')" class="theme-chip px-3 py-1 bg-slate-800 text-slate-300 text-xs rounded-full hover:bg-slate-700 transition">Tracking Issues</button>
+                            <button onclick="toggleThemeFilter('Damaged Packaging')" class="theme-chip px-3 py-1 bg-slate-800 text-slate-300 text-xs rounded-full hover:bg-slate-700 transition">Damaged Packaging</button>
+                        </div>
+                    </div>
+
+                    <!-- REVIEWS DYNAMIC RESULT LIST -->
+                    <div id="reviews-list-container" class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <!-- Loaded dynamically via JS -->
+                    </div>
+                </section>
+
+                <!-- 5. OPPORTUNITIES PANEL -->
+                <section id="panel-opportunities" class="panel">
+                    <div class="mb-8">
+                        <h2 class="text-3xl font-extrabold tracking-tight text-white mb-2">AI Opportunity Finder</h2>
+                        <p class="text-slate-400">Discover unmet consumer demands synthesized from review analysis.</p>
+                    </div>
+
+                    <div class="grid lg:grid-cols-3 gap-8">
+                        <div class="card rounded-3xl p-6 lg:col-span-2 border-indigo-500/20 bg-gradient-to-br from-indigo-500/5 via-slate-900/40 to-slate-950/80 relative overflow-hidden">
+                            <!-- HEADER -->
+                            <div class="flex items-center gap-4 mb-6">
+                                <div class="w-12 h-12 rounded-xl bg-indigo-600/20 text-indigo-400 flex items-center justify-center text-2xl font-bold">
+                                    💡
+                                </div>
+                                <div>
+                                    <span class="text-xs font-bold text-indigo-400 uppercase tracking-widest">Trending Topic Demand</span>
+                                    <h3 class="text-2xl font-bold text-white mt-0.5">Launch Travel-Size Product SKUs</h3>
+                                </div>
+                            </div>
+
+                            <p class="text-slate-300 leading-relaxed text-sm mb-6">
+                                Over <span class="font-bold text-white">346 positive customer reviews</span> this month request travel-friendly, portable packaging configurations. The volume represents a 280% increase month-over-month.
+                            </p>
+
+                            <!-- METRICS -->
+                            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-xs mb-8">
+                                <div class="p-3 bg-slate-950/60 rounded-xl border border-slate-800/80">
+                                    <p class="text-slate-500">Monthly Mentions</p>
+                                    <p class="text-lg font-bold text-white mt-1">346</p>
+                                </div>
+                                <div class="p-3 bg-slate-950/60 rounded-xl border border-slate-800/80">
+                                    <p class="text-slate-500">Growth Rate</p>
+                                    <p class="text-lg font-bold text-emerald-400 mt-1">+280%</p>
+                                </div>
+                                <div class="p-3 bg-slate-950/60 rounded-xl border border-slate-800/80">
+                                    <p class="text-slate-500">Confidence</p>
+                                    <p class="text-lg font-bold text-white mt-1">91%</p>
+                                </div>
+                                <div class="p-3 bg-slate-950/60 rounded-xl border border-slate-800/80">
+                                    <p class="text-slate-500">Potential</p>
+                                    <p class="text-lg font-bold text-indigo-300 mt-1">High ROI</p>
+                                </div>
+                            </div>
+
+                            <!-- LAUNCH TIMELINE -->
+                            <h4 class="font-semibold text-sm mb-3 text-slate-300">Phase Launch Plan</h4>
+                            <div class="space-y-3.5 text-xs text-slate-400">
+                                <div class="flex items-center gap-3">
+                                    <span class="w-6 h-6 rounded-full bg-indigo-600 text-white flex items-center justify-center font-bold">1</span>
+                                    <span>Design leak-resistant mini travel bottle cap (15ml / 30ml SKU sizes)</span>
+                                </div>
+                                <div class="flex items-center gap-3">
+                                    <span class="w-6 h-6 rounded-full bg-slate-800 text-slate-400 flex items-center justify-center font-bold">2</span>
+                                    <span>Verify formulations compliance with air travel fluid volume limits</span>
+                                </div>
+                                <div class="flex items-center gap-3">
+                                    <span class="w-6 h-6 rounded-full bg-slate-800 text-slate-400 flex items-center justify-center font-bold">3</span>
+                                    <span>Deploy targeted Google & Meta campaigns to portable beauty buyers</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- LIVE CALCULATOR -->
+                        <div class="card rounded-3xl p-6 border-indigo-500/20 bg-indigo-950/5 flex flex-col justify-between">
+                            <div>
+                                <h3 class="text-lg font-bold text-white mb-4">Interactive Revenue Calculator</h3>
+                                <p class="text-xs text-slate-400 mb-6">Estimate the ROI of creating travel-size variants.</p>
+
+                                <div class="space-y-6">
+                                    <div>
+                                        <div class="flex justify-between text-xs mb-2">
+                                            <span class="text-slate-400">Projected Mini SKU Price ($)</span>
+                                            <span class="text-white font-bold" id="calc-price-label">$12</span>
+                                        </div>
+                                        <input type="range" id="calc-price" min="5" max="30" value="12" oninput="calculateRevenue()" class="w-full h-1 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-indigo-500">
+                                    </div>
+
+                                    <div>
+                                        <div class="flex justify-between text-xs mb-2">
+                                            <span class="text-slate-400">Projected Monthly Units Sold</span>
+                                            <span class="text-white font-bold" id="calc-volume-label">5,000</span>
+                                        </div>
+                                        <input type="range" id="calc-volume" min="1000" max="20000" step="500" value="5000" oninput="calculateRevenue()" class="w-full h-1 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-indigo-500">
+                                    </div>
+                                </div>
+
+                                <div class="mt-8 pt-6 border-t border-slate-800/80 space-y-4">
+                                    <div class="flex justify-between">
+                                        <span class="text-xs text-slate-500">Monthly Added Revenue</span>
+                                        <span class="text-sm font-bold text-emerald-400" id="calc-monthly">$60,000</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span class="text-xs text-slate-500">Est. Annual Revenue Run</span>
+                                        <span class="text-lg font-black text-indigo-400" id="calc-annual">$720,000</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <button class="mt-8 w-full text-center text-xs bg-indigo-600 hover:bg-indigo-700 py-3 rounded-xl font-bold text-white transition shadow-lg shadow-indigo-600/20">
+                                Draft Product Proposal
+                            </button>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 6. AI ANALYST PANEL -->
+                <section id="panel-ai-analyst" class="panel">
+                    <div class="mb-8">
+                        <h2 class="text-3xl font-extrabold tracking-tight text-white mb-2">AI Copilot</h2>
+                        <p class="text-slate-400">Drill down into feedback, generate summaries, and isolate product reviews.</p>
+                    </div>
+
+                    <!-- COPILOT WORKSPACE -->
+                    <div class="card rounded-3xl p-6 lg:col-span-3">
+                        <div class="flex items-center gap-4 mb-6 pb-4 border-b border-slate-800/80">
+                            <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 to-blue-500 flex items-center justify-center font-bold text-white text-lg">
+                                🤖
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-white leading-none">Voice AI Analyst</h3>
+                                <span class="text-[10px] text-emerald-400 font-semibold uppercase tracking-wider">Ready to assist</span>
+                            </div>
+                        </div>
+
+                        <!-- CHAT LOG CONTAINER -->
+                        <div id="chat-history-container" class="h-96 overflow-y-auto mb-6 space-y-4 p-4 bg-slate-950/40 border border-slate-800 rounded-2xl">
+                            <!-- INTRO MESSAGE -->
+                            <div class="flex items-start gap-3 text-sm">
+                                <div class="w-8 h-8 rounded-lg bg-indigo-600/20 text-indigo-400 flex items-center justify-center font-bold shrink-0">
+                                    AI
+                                </div>
+                                <div class="bg-slate-900 border border-slate-800 rounded-2xl rounded-tl-none p-4 max-w-xl text-slate-300 leading-relaxed">
+                                    Hello, I'm your Voice AI Analyst. I have indexed your 12,548 customer reviews. Ask me any question, or click one of the suggested prompts below to start investigating.
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- SUGGESTED QUESTIONS CHIPS -->
+                        <div class="mb-6 flex flex-wrap gap-2.5">
+                            <button onclick="submitSuggestedQuestion('What is hurting my ratings?')" class="bg-slate-900 border border-slate-800 hover:border-indigo-500/30 text-xs px-3.5 py-2 rounded-xl text-slate-300 hover:text-white transition">
+                                What is hurting my ratings?
+                            </button>
+                            <button onclick="submitSuggestedQuestion('Which product is most at risk?')" class="bg-slate-900 border border-slate-800 hover:border-indigo-500/30 text-xs px-3.5 py-2 rounded-xl text-slate-300 hover:text-white transition">
+                                Which product is most at risk?
+                            </button>
+                            <button onclick="submitSuggestedQuestion('Summarize sunscreen feedback')" class="bg-slate-900 border border-slate-800 hover:border-indigo-500/30 text-xs px-3.5 py-2 rounded-xl text-slate-300 hover:text-white transition">
+                                Summarize sunscreen feedback
+                            </button>
+                            <button onclick="submitSuggestedQuestion('What should I fix first?')" class="bg-slate-900 border border-slate-800 hover:border-indigo-500/30 text-xs px-3.5 py-2 rounded-xl text-slate-300 hover:text-white transition">
+                                What should I fix first?
+                            </button>
+                        </div>
+
+                        <!-- INPUT BOX -->
+                        <form onsubmit="handleChatSubmit(event)" class="bg-slate-900 border border-slate-800 rounded-xl p-2.5 flex items-center gap-3">
+                            <input type="text" id="copilot-input" placeholder="Type a request (e.g. show reviews about packaging, forecast score drop)..." class="w-full bg-transparent text-sm text-slate-100 placeholder-slate-500 px-3 py-2 outline-none">
+                            <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs px-5 py-2.5 rounded-lg transition shrink-0">
+                                Send Question
+                            </button>
+                        </form>
+                    </div>
+                </section>
+
+            </div>
+
+            <!-- FOOTER BRANDING -->
+            <footer class="mt-10 border-t border-slate-800/80 pt-6 text-center lg:text-left flex flex-col lg:flex-row justify-between items-center text-xs text-slate-500 gap-4">
+                <p>© 2026 Revlytics Inc. All metrics generated from customer review analysis API.</p>
+                <div class="flex gap-4">
+                    <a href="#" class="hover:underline hover:text-slate-400">Terms of Use</a>
+                    <a href="#" class="hover:underline hover:text-slate-400">Data Security SLA</a>
+                    <a href="#" class="hover:underline hover:text-slate-400">Feedback Logs</a>
+                </div>
+            </footer>
+
+        </main>
+    </div>
+
+    <!-- DYNAMIC JAVASCRIPT LAYER -->
+    <script>
+        // SPA NAVIGATION ROUTER
+        function switchTab(targetTabId) {
+            // Update Active panel element
+            const panels = document.querySelectorAll('.panel');
+            panels.forEach(p => {
+                p.classList.remove('active');
+            });
+
+            const targetPanel = document.getElementById(`panel-${targetTabId}`);
+            if (targetPanel) {
+                targetPanel.classList.add('active');
+            }
+
+            // Update Active sidebar nav state
+            const sidebarButtons = document.querySelectorAll('#sidebar-nav button');
+            sidebarButtons.forEach(btn => {
+                if (btn.getAttribute('data-target') === targetTabId) {
+                    btn.classList.add('active');
+                    btn.classList.remove('text-slate-400', 'hover:text-white', 'hover:bg-slate-800/50');
+                } else {
+                    btn.classList.remove('active');
+                    btn.classList.add('text-slate-400', 'hover:text-white', 'hover:bg-slate-800/50');
+                }
+            });
+
+            // Update Mobile nav buttons state
+            const mobileButtons = document.querySelectorAll('#mobile-nav-buttons button');
+            mobileButtons.forEach(btn => {
+                if (btn.getAttribute('data-target') === targetTabId) {
+                    btn.classList.add('text-indigo-400', 'border', 'border-indigo-500/20', 'bg-indigo-500/10');
+                    btn.classList.remove('text-slate-400');
+                } else {
+                    btn.classList.remove('text-indigo-400', 'border', 'border-indigo-500/20', 'bg-indigo-500/10');
+                    btn.classList.add('text-slate-400');
+                }
+            });
+        }
+
+        // Add Event Listeners for Nav buttons
+        document.addEventListener('DOMContentLoaded', () => {
+            const sidebarButtons = document.querySelectorAll('#sidebar-nav button');
+            sidebarButtons.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const target = btn.getAttribute('data-target');
+                    switchTab(target);
+                });
+            });
+
+            const mobileNavButtons = document.querySelectorAll('#mobile-nav-buttons button');
+            mobileNavButtons.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const target = btn.getAttribute('data-target');
+                    switchTab(target);
+                });
+            });
+
+            // Initial render of Voice of Customer reviews
+            renderReviews();
+            calculateRevenue();
+        });
+
+
+        // PRODUCT HEALTH STATUS FILTERS
+        function filterProducts(status) {
+            // Update filter buttons states
+            const buttons = document.querySelectorAll('.prod-filter-btn');
+            buttons.forEach(btn => {
+                btn.classList.remove('bg-indigo-600', 'text-white');
+                btn.classList.add('text-slate-400', 'hover:text-white');
+            });
+
+            const activeBtn = document.getElementById(`prod-filter-${status}`);
+            if (activeBtn) {
+                activeBtn.classList.remove('text-slate-400', 'hover:text-white');
+                activeBtn.classList.add('bg-indigo-600', 'text-white');
+            }
+
+            // Filter actual cards
+            const cards = document.querySelectorAll('.product-card');
+            cards.forEach(card => {
+                if (status === 'all' || card.getAttribute('data-status') === status) {
+                    card.style.display = 'flex';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+
+        function drillDownProduct(name) {
+            const container = document.getElementById('product-drilldown-section');
+            const title = document.getElementById('drilldown-title');
+            
+            title.textContent = `${name} Sentiment Breakdown`;
+            container.classList.remove('hidden');
+            
+            // Auto scroll down to detailed breakdown
+            container.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function closeProductDrilldown() {
+            const container = document.getElementById('product-drilldown-section');
+            container.classList.add('hidden');
+        }
+
+
+        // ISSUE CHECKLIST PROGRESS INTERACTIVITY
+        function updateChecklistProgress() {
+            const checkboxes = document.querySelectorAll('.issue-checkbox');
+            const total = checkboxes.length;
+            let checkedCount = 0;
+
+            checkboxes.forEach(chk => {
+                if (chk.checked) {
+                    checkedCount++;
+                }
+            });
+
+            const percentage = Math.round((checkedCount / total) * 100);
+            const progressLabel = document.getElementById('checklist-progress');
+            progressLabel.textContent = `${percentage}% Completed`;
+
+            if (percentage === 100) {
+                progressLabel.className = "text-xs text-emerald-400 font-bold animate-bounce";
+                progressLabel.textContent = "100% - Ready to Resolve!";
+            } else {
+                progressLabel.className = "text-xs text-indigo-400 font-bold";
+            }
+        }
+
+
+        // CUSTOMER VOICE REVIEWS DATA & DYNAMIC FILTERING
+        const reviewsDatabase = [
+            {
+                content: "The product quality is excellent, but delivery took almost a week. Would definitely buy again if shipping improves.",
+                platform: "Amazon",
+                date: "2 days ago",
+                rating: 4,
+                themes: ["Product Quality", "Delivery Delays"]
+            },
+            {
+                content: "Packaging feels premium and the results were visible within a few days. Very impressed.",
+                platform: "Shopify",
+                date: "1 day ago",
+                rating: 5,
+                themes: ["Premium Packaging", "Product Quality"]
+            },
+            {
+                content: "Customer support was helpful, but delivery updates were confusing. Tracking needs improvement.",
+                platform: "Flipkart",
+                date: "3 days ago",
+                rating: 3,
+                themes: ["Tracking Issues", "Delivery Delays"]
+            },
+            {
+                content: "The serum has a great texture and absorbs quickly. My skin feels so soft!",
+                platform: "Google",
+                date: "4 days ago",
+                rating: 5,
+                themes: ["Product Quality"]
+            },
+            {
+                content: "Damaged packaging on arrival. The box was crushed and leaked slightly. Disappointed.",
+                platform: "Amazon",
+                date: "5 days ago",
+                rating: 2,
+                themes: ["Damaged Packaging", "Tracking Issues"]
+            },
+            {
+                content: "Good value for money, but the delivery delays are frustrating.",
+                platform: "Flipkart",
+                date: "6 days ago",
+                rating: 3,
+                themes: ["Delivery Delays"]
+            },
+            {
+                content: "Excellent packaging design, very travel friendly! Hope they make a smaller mini version.",
+                platform: "Google",
+                date: "1 week ago",
+                rating: 5,
+                themes: ["Premium Packaging"]
+            }
+        ];
+
+        let selectedThemeFilter = null;
+
+        function toggleThemeFilter(themeName) {
+            const chips = document.querySelectorAll('.theme-chip');
+            chips.forEach(chip => {
+                if (chip.textContent === themeName) {
+                    if (selectedThemeFilter === themeName) {
+                        // De-select
+                        selectedThemeFilter = null;
+                        chip.classList.remove('bg-indigo-600', 'text-white');
+                        chip.classList.add('bg-slate-800', 'text-slate-300');
+                    } else {
+                        // Select
+                        selectedThemeFilter = themeName;
+                        chip.classList.remove('bg-slate-800', 'text-slate-300');
+                        chip.classList.add('bg-indigo-600', 'text-white');
+                    }
+                } else {
+                    chip.classList.remove('bg-indigo-600', 'text-white');
+                    chip.classList.add('bg-slate-800', 'text-slate-300');
+                }
+            });
+            filterReviews();
+        }
+
+        function filterReviews() {
+            const searchQuery = document.getElementById('review-search').value.toLowerCase();
+            const platformFilter = document.getElementById('review-platform').value;
+            const ratingFilter = document.getElementById('review-rating').value;
+
+            const filtered = reviewsDatabase.filter(r => {
+                const matchesSearch = r.content.toLowerCase().includes(searchQuery);
+                const matchesPlatform = platformFilter === 'all' || r.platform === platformFilter;
+                const matchesRating = ratingFilter === 'all' || r.rating.toString() === ratingFilter;
+                const matchesTheme = !selectedThemeFilter || r.themes.includes(selectedThemeFilter);
+
+                return matchesSearch && matchesPlatform && matchesRating && matchesTheme;
+            });
+
+            renderReviews(filtered);
+        }
+
+        function renderReviews(reviewsArray = reviewsDatabase) {
+            const container = document.getElementById('reviews-list-container');
+            container.innerHTML = '';
+
+            if (reviewsArray.length === 0) {
+                container.innerHTML = `
+                    <div class="col-span-full py-12 text-center text-slate-500 text-sm">
+                        No customer reviews match your selected filter criteria.
+                    </div>
+                `;
+                return;
+            }
+
+            reviewsArray.forEach(rev => {
+                const starsText = '⭐'.repeat(rev.rating);
+                
+                const card = document.createElement('div');
+                card.className = "bg-slate-900/80 rounded-2xl p-5 border border-slate-800 hover:border-slate-700/60 transition flex flex-col justify-between";
+                
+                // Construct themes tags list HTML
+                let tagsHtml = '';
+                rev.themes.forEach(t => {
+                    let colorClass = "bg-indigo-500/10 text-indigo-300 border-indigo-500/20";
+                    if (t === 'Delivery Delays' || t === 'Damaged Packaging' || t === 'Tracking Issues') {
+                        colorClass = "bg-red-500/10 text-red-300 border-red-500/20";
+                    } else {
+                        colorClass = "bg-emerald-500/10 text-emerald-300 border-emerald-500/20";
+                    }
+                    tagsHtml += `<span class="px-2 py-0.5 rounded text-[10px] font-semibold border ${colorClass}">${t}</span>`;
+                });
+
+                card.innerHTML = `
+                    <div>
+                        <div class="flex justify-between items-center mb-3">
+                            <span class="text-xs text-yellow-400 font-bold">${starsText}</span>
+                            <span class="text-[10px] font-bold uppercase tracking-wider text-slate-500 bg-slate-950 px-2 py-0.5 rounded">${rev.platform}</span>
+                        </div>
+                        <p class="text-xs text-slate-300 leading-relaxed mb-4">"${rev.content}"</p>
+                    </div>
+                    <div>
+                        <div class="flex flex-wrap gap-1.5 mb-3">${tagsHtml}</div>
+                        <p class="text-[10px] text-slate-500 font-medium">${rev.date}</p>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+
+        // OPPORTUNITIES REVENUE CALCULATOR
+        function calculateRevenue() {
+            const price = parseFloat(document.getElementById('calc-price').value);
+            const volume = parseInt(document.getElementById('calc-volume').value);
+
+            // Update text readouts
+            document.getElementById('calc-price-label').textContent = `$${price}`;
+            document.getElementById('calc-volume-label').textContent = volume.toLocaleString();
+
+            const monthlyRevenue = price * volume;
+            const annualRevenue = monthlyRevenue * 12;
+
+            document.getElementById('calc-monthly').textContent = `$${monthlyRevenue.toLocaleString()}`;
+            document.getElementById('calc-annual').textContent = `$${annualRevenue.toLocaleString()}`;
+        }
+
+
+        // AI ANALYST COPILOT SIMULATED INTERACTIVE CHAT
+        const copilotResponses = {
+            "what is hurting my ratings?": "Delivery delays account for <span class='text-red-400 font-semibold'>35%</span> of negative reviews. The issue is primarily affecting <span class='font-semibold text-white'>Vitamin C Serum</span> orders fulfilled on <span class='font-semibold text-white'>Amazon IN</span>. Resolving courier delays will potentially raise average ratings from <span class='text-emerald-400 font-semibold'>4.3 → 4.6</span>.",
+            "which product is most at risk?": "Your <span class='text-red-400 font-semibold'>Sunscreen SPF 50</span> is currently most at risk with a Health Score of <span class='text-red-400 font-semibold'>71</span> (At Risk). Sentiment drops are driven by increasing feedback about cap leakages (24% of bad reviews) and a greasy feeling upon skin application (18%).",
+            "summarize sunscreen feedback": "The Sunscreen SPF 50 has 1,203 total reviews averaging <span class='font-semibold text-white'>⭐ 3.7</span>. Dominant issues are <span class='text-red-400 font-semibold'>cap leaks</span> and <span class='text-amber-400 font-semibold'>heavy texture</span>. Positive reviewers enjoy the UV protection strength but suggest lighter formulations.",
+            "what should i fix first?": "Prioritize the <span class='text-indigo-400 font-semibold'>Vitamin C Serum delivery delays</span>. Vitamin C is your highest-volume seller (4,312 reviews). Fixing delivery speeds has a 4.5x greater customer retention impact than modifying sunscreen formulas first."
+        };
+
+        function submitSuggestedQuestion(qText) {
+            document.getElementById('copilot-input').value = qText;
+            handleChatSubmit(new Event('submit'));
+        }
+
+        function handleChatSubmit(event) {
+            if (event) event.preventDefault();
+
+            const inputEl = document.getElementById('copilot-input');
+            const query = inputEl.value.trim();
+            if (!query) return;
+
+            // Clear input
+            inputEl.value = '';
+
+            // Add user message to log
+            appendMessage("User", query);
+
+            // Add AI thinking loader bubble
+            const historyContainer = document.getElementById('chat-history-container');
+            const loaderDiv = document.createElement('div');
+            loaderDiv.id = "copilot-thinking-loader";
+            loaderDiv.className = "flex items-start gap-3 text-sm";
+            loaderDiv.innerHTML = `
+                <div class="w-8 h-8 rounded-lg bg-indigo-600/20 text-indigo-400 flex items-center justify-center font-bold shrink-0">
+                    AI
+                </div>
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl rounded-tl-none p-4 max-w-xl text-slate-500 flex items-center gap-1.5">
+                    <span class="text-xs">Analyzing reviews</span>
+                    <span class="flex gap-1">
+                        <span class="w-1.5 h-1.5 bg-slate-500 rounded-full typing-dot"></span>
+                        <span class="w-1.5 h-1.5 bg-slate-500 rounded-full typing-dot"></span>
+                        <span class="w-1.5 h-1.5 bg-slate-500 rounded-full typing-dot"></span>
+                    </span>
+                </div>
+            `;
+            historyContainer.appendChild(loaderDiv);
+            historyContainer.scrollTop = historyContainer.scrollHeight;
+
+            // Delay response to simulate AI processing
+            setTimeout(() => {
+                // Remove loader
+                const loader = document.getElementById('copilot-thinking-loader');
+                if (loader) loader.remove();
+
+                // Generate response text
+                const normQuery = query.toLowerCase();
+                let answer = "";
+
+                if (copilotResponses[normQuery]) {
+                    answer = copilotResponses[normQuery];
+                } else if (normQuery.includes('delivery') || normQuery.includes('shipping') || normQuery.includes('delay')) {
+                    answer = "Our reviews databases show shipping bottlenecks are centered around Amazon fulfillment. Mentions of delivery delays spiked <span class='text-red-400 font-bold'>+22%</span> in June. Check the SLA tracker on the Issues tab.";
+                } else if (normQuery.includes('travel') || normQuery.includes('mini') || normQuery.includes('opportunity')) {
+                    answer = "Travel-Size packaging requests represent a high demand signal. A launch estimate predicts up to <span class='text-emerald-400 font-bold'>$720,000</span> in incremental annual revenue at standard SKU pricing.";
+                } else if (normQuery.includes('serum') || normQuery.includes('vitamin')) {
+                    answer = "Vitamin C Serum holds a healthy score of <span class='text-emerald-400 font-bold'>92</span>. Drop shipper speed is the only drag on ratings. Product formulation praise is high at 95% positive.";
+                } else if (normQuery.includes('sunscreen') || normQuery.includes('leak') || normQuery.includes('texture')) {
+                    answer = "Sunscreen SPF 50 is At Risk (Health Score: 71). Leakage represents 24% of friction, greasy texture is 18%. Formulation adjustments are under review.";
+                } else {
+                    answer = `Analyzing your request: "${query}". Based on 12,548 reviews, Brand Health stands at 87. Main issue is Delivery Delays (35% impact). Recommended launch is the travel SKU (Mini).`;
+                }
+
+                // Append AI reply
+                appendMessage("AI", answer);
+            }, 1000);
+        }
+
+        function appendMessage(sender, text) {
+            const container = document.getElementById('chat-history-container');
+            const msgDiv = document.createElement('div');
+            msgDiv.className = "flex items-start gap-3 text-sm";
+            
+            if (sender === "User") {
+                msgDiv.innerHTML = `
+                    <div class="w-8 h-8 rounded-lg bg-slate-800 text-slate-300 flex items-center justify-center font-bold shrink-0 ml-auto order-last">
+                        U
+                    </div>
+                    <div class="bg-indigo-600 text-white rounded-2xl rounded-tr-none p-4 max-w-xl ml-auto leading-relaxed">
+                        ${text}
+                    </div>
+                `;
+            } else {
+                msgDiv.innerHTML = `
+                    <div class="w-8 h-8 rounded-lg bg-indigo-600/20 text-indigo-400 flex items-center justify-center font-bold shrink-0">
+                        AI
+                    </div>
+                    <div class="bg-slate-900 border border-slate-800 rounded-2xl rounded-tl-none p-4 max-w-xl text-slate-300 leading-relaxed">
+                        ${text}
+                    </div>
+                `;
+            }
+
+            container.appendChild(msgDiv);
+            container.scrollTop = container.scrollHeight;
+        }
+    </script>
+</body>
+
+</html>
